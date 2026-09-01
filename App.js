@@ -1,20 +1,36 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import { NavigationContainer } from "@react-navigation/native";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
+
+import HomeScreen from "./src/screens/Home";
+import PosicaoGPSScreen from "./src/screens/PosicaoGPS";
+// import RedesWifi from "./src/screen/RedesWifi";
+import RedesWifiScreen from "./src/screens/RedesWifi";
+
+const Stack = createNativeStackNavigator()
 
 export default function App() {
   return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
+   <NavigationContainer>
+    <Stack.Navigator>
+      <Stack.Screen
+      name= "HomeScreen"
+      component={HomeScreen}
+      options= {{headerShown:false}}
+      />
+
+      <Stack.Screen
+      name= "PosicaoGPSScreen"
+      component={PosicaoGPSScreen}
+      options= {{title: 'Posição Atual'}}
+      />
+
+      <Stack.Screen
+      name= "RedesWifiScreen"
+      component={RedesWifiScreen}
+      options= {{title: 'Redes Wifi'}}
+      />
+    </Stack.Navigator>
+   </NavigationContainer>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
