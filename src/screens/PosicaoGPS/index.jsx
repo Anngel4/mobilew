@@ -161,9 +161,6 @@ export default function PosicaoGPSScreen() {
                 </Text>
               </View>
 
-              {/* <View style={{ marginTop: 2 }}>
-                <Button title="Atualizar Localização" onPress={pedirConfirmacao} />
-              </View> */}
             </View>
           )}
         </View>

@@ -1,25 +1,29 @@
-import React, { useCallback, useEffect, useState } from "react"
-import { View, StyleSheet, TouchableOpacity, Text, ActivityIndicator } from "react-native";
-import { useNavigation } from "@react-navigation/native";
+import React, { use, useCallback, useEffect, useState } from "react";
+import { useNavigation } from '@react-navigation/native';
+import { View, StyleSheet, TouchableOpacity, Text } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import * as Network from 'expo-network';
+import * as Network from 'expo-network'
+import { ActivityIndicator } from "react-native";
+
 
 export default function RedesWifiScreen() {
+  const navigation = useNavigation();
+
 
   const [info, setInfo] = useState(null);
   const [loading, setLoading] = useState(true);
   const [errorMsg, setErrorMsg] = useState(null);
 
+
   useEffect(() => {
     carregaRede();
 
     const subscription = Network.addNetworkStateListener(() => {
-      carregaRede();
+      carregaRede()
     })
     return () => subscription.remove();
   }, []);
 
-  //Limpar erros que tenham durante o loading
   const carregaRede = useCallback(async () => {
     setLoading(true);
     setErrorMsg(null);
@@ -31,63 +35,54 @@ export default function RedesWifiScreen() {
       let airplane = false;
 
       try {
-        ip = await Network.getIpAddressAsync()
-      } catch (error) {
+        ip = await Network.getIpAddressAsync();
+      } catch {
         ip = 'Indisponível';
       }
+
       try {
-        ip = await Network.isAirplaneModeEnabledAsync()
-      } catch (error) {
-        airplane = false
+        airplane = await Network.isAirplaneModeEnabledAsync();
+      } catch {
+        airplane = false;
       }
 
-      //Terminar setando as informações
       setInfo({
         type: state.type ?? Network.NetworkStateType.UNKNOWN,
         isConnected: state.isConnected ?? false,
         isInternetReachable: state.isInternetReachable ?? false,
-        ipAdress: ip,
+        ipAddress: ip,
         isAirplaneMode: airplane
       })
+
+
     } catch (error) {
-      console.error(error);
       setErrorMsg('Não foi possível obter as informações da rede.');
+
     } finally {
       setLoading(false);
     }
 
   }, [])
 
-  //Identificar tipo de rede
   const isWifi = info?.type === Network.NetworkStateType.WIFI;
-
-  //Armazenar tipo de rótulo
   const tipoLabel = info ? info.type ?? info.type : '-';
 
   return (
     <SafeAreaView style={[styles.screen, styles.content]}>
-      <Text style={styles.title}>Conexão de rede</Text>
-      <Text style={styles.subtitle}>Status da conexão ativa</Text>
+      <Text style={styles.title}>Conexão de rede </Text>
+      <Text style={styles.subtitle}>Status da conexão ativa </Text>
 
       {loading && info === null ? (
-
-        //Bolinha de carregando
         <View style={styles.loadingBox}>
-          <ActivityIndicator size='large' color='#25883E' />
-          <Text style={styles.loadingText}>Consultando a rede...</Text>
+          <ActivityIndicator size='large' color='#23883E' />
+          <Text style={styles.loadingBox}>Consultando a rede...</Text>
         </View>
-
       ) : errorMsg ? (
-
-        //Mensagem de erro
         <View style={[styles.card, styles.errorCard]}>
           <Text style={styles.errorText}>{errorMsg}</Text>
         </View>
-
       ) : (
         info && (
-
-          //Pontinho verde de conectado ou não
           <View style={styles.card}>
             <View style={styles.statusRow}>
               <View style={[styles.statusDot,
@@ -100,25 +95,23 @@ export default function RedesWifiScreen() {
             </View>
 
             <View style={styles.divider} />
-            <InfoRow label='Tipo de conexão' value={tipoLabel} />
+            <InfoRow label='Tipo de conexão' value={tipoLabel}/>
             <InfoRow label='Rede Wi-fi'
-              value={isWifi ? 'Conectado via Wi-fi' : 'Não conectado por wi-fi'}
+              value={isWifi ? 'Conectado via wi-fi' : 'Não conectado por wifi'}
             />
             <InfoRow label='Internet acessível'
-              value={info.isInternetReachable ? 'SIM' : 'NÃO'}
+              value={info.isInternetReachable ? 'Sim' : 'Não'}
             />
             <InfoRow label='Endereço IP'
-              value={info.ipAdress}
+              value={info.ipAddress}
             />
-            <InfoRow label='Endereço IP'
+            <InfoRow label='Modo avião'
               value={info.isAirplaneMode ? 'Ativado' : 'Desativado'}
             />
           </View>
-
         ))}
 
-    </SafeAreaView>
-  )
+    </SafeAreaView>)
 }
 
 // ─── Componente auxiliar InfoRow ──────────────────────────────────────────────
@@ -135,6 +128,8 @@ function InfoRow({ label, value }) {
     </View>
   );
 }
+
+
 
 // ─── Estilos ──────────────────────────────────────────────────────────────────
 const styles = StyleSheet.create({
@@ -291,4 +286,3 @@ const styles = StyleSheet.create({
     fontWeight: "700",   // Negrito — enfatiza a ação
   },
 });
-
